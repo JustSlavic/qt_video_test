@@ -4,21 +4,31 @@
 
 #include "main_window.hpp"
 
+#include <QLayout>
 #include <QMenuBar>
+#include <QVideoWidget>
 
 
 MainWindow::MainWindow() {
-    this->createMenu();
+    this->addMenu();
+    this->addVideoWidget();
 }
 
+void MainWindow::addMenu() {
+    auto menu = this->menuBar();
 
-void MainWindow::createMenu() {
-    auto menu = new QMenuBar();
-
-    auto menuFile = new QMenu("File", menu);
-    menuFile->addAction("Load file...");
+    auto menuFile = new QMenu("&File", menu);
+    menuFile->addAction("&Load file...");
 
     menu->addMenu(menuFile);
 
+    // MainWindow takes ownership over the QMenuBar
     this->setMenuBar(menu);
+}
+
+void MainWindow::addVideoWidget() {
+    auto videoWidget = new QVideoWidget();
+
+    // layout takes ownership over the QVideoWidget
+    this->setCentralWidget(videoWidget);
 }

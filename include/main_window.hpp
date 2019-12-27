@@ -13,5 +13,6 @@ public:
     MainWindow();
 
 private:
-    void createMenu();
+    void addMenu();
+    void addVideoWidget();
 };
