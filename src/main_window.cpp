@@ -9,6 +9,7 @@
 #include <QVideoWidget>
 #include <QCameraInfo>
 #include <QtWidgets/QFileDialog>
+#include <QStandardPaths>
 
 MainWindow::MainWindow()
     : mediaPlayer(new QMediaPlayer(this)), videoWidget(new QVideoWidget()) {
@@ -30,10 +31,9 @@ void MainWindow::addMenu() {
   auto cameraAction = menuFile->addAction("&Camera");
 
   connect(loadFileAction, &QAction::triggered, [this]() {
-    // todo get home directory
     QString videoFilePath = QFileDialog::getOpenFileName(this,
                                                          tr("Select video"),
-                                                         "/home/radko",
+                                                         QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
                                                          tr("Video files (*.mp4 *.avi *.mkv);;All files (*)"));
     if (videoFilePath.isNull()) return;
 
