@@ -5,14 +5,21 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QCamera>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     MainWindow();
 
+public slots:
+    void playVideo();
+    QCamera* findCamera();
+
 private:
     void addMenu();
-    void addVideoWidget();
+
+    QMediaPlayer* mediaPlayer;
+    QVideoWidget* videoWidget;
 };

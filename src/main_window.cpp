@@ -7,11 +7,20 @@
 #include <QLayout>
 #include <QMenuBar>
 #include <QVideoWidget>
+#include <QCameraInfo>
 
 
-MainWindow::MainWindow() {
+MainWindow::MainWindow()
+    : mediaPlayer(new QMediaPlayer(this))
+    , videoWidget(new QVideoWidget()) {
+
     this->addMenu();
-    this->addVideoWidget();
+
+    videoWidget->setMinimumSize(300, 300);
+
+    // MainWindow takes ownership over QVideoWidget
+    setCentralWidget(videoWidget);
+    mediaPlayer->setVideoOutput(videoWidget);
 }
 
 void MainWindow::addMenu() {
@@ -26,9 +35,17 @@ void MainWindow::addMenu() {
     this->setMenuBar(menu);
 }
 
-void MainWindow::addVideoWidget() {
-    auto videoWidget = new QVideoWidget();
+void MainWindow::playVideo() {
+    mediaPlayer->setMedia(QUrl::fromLocalFile("/home/radko/Storage/Anime/me!me!me!_daoko_feat_teddyloid.mp4"));
+    mediaPlayer->play();
 
-    // layout takes ownership over the QVideoWidget
-    this->setCentralWidget(videoWidget);
+    qDebug() << videoWidget->isVisible();
 }
+
+QCamera* MainWindow::findCamera() {
+    const QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+    if (cameras.empty()) return nullptr;
+
+    return new QCamera(cameras.at(0));
+}
+
