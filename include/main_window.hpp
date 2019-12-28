@@ -9,17 +9,17 @@
 #include <QtMultimedia/QCamera>
 
 class MainWindow : public QMainWindow {
-    Q_OBJECT
-public:
-    MainWindow();
+ Q_OBJECT
+ public:
+  MainWindow();
 
-public slots:
-    void playVideo();
-    QCamera* findCamera();
+ public slots:
+  QCamera* findCamera();
+ private:
 
-private:
-    void addMenu();
+  void playVideo(QString& filepath);
+  void addMenu();
 
-    QMediaPlayer* mediaPlayer;
-    QVideoWidget* videoWidget;
+  QMediaPlayer* mediaPlayer;
+  QVideoWidget* videoWidget;
 };

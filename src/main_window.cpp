@@ -27,25 +27,38 @@ void MainWindow::addMenu() {
     auto menu = this->menuBar();
 
     auto menuFile = new QMenu("&File", menu);
-    menuFile->addAction("&Load file...");
+    auto loadFileAction = menuFile->addAction("&Load file...");
+    auto cameraAction = menuFile->addAction("&Camera");
+
+    connect(loadFileAction, &QAction::triggered, [this]() {
+      // todo get home directory
+      QString videoFilePath = QFileDialog::getOpenFileName(this, tr("Select video"), "/home/radko", tr("Video files (*.mp4 *.avi *.mkv);;All files (*)"));
+      if (videoFilePath.isNull()) return;
+
+      this->playVideo(videoFilePath);
+    });
+
+    auto menuFilter = new QMenu("&Filter", menu);
+    menuFilter->addAction("&No filter");
+    menuFilter->addAction("&Gaussian blur");
+    menuFilter->addAction("&Sobel operator");
 
     menu->addMenu(menuFile);
+    menu->addMenu(menuFilter);
 
     // MainWindow takes ownership over the QMenuBar
     this->setMenuBar(menu);
 }
 
-void MainWindow::playVideo() {
-    mediaPlayer->setMedia(QUrl::fromLocalFile("/home/radko/Storage/Anime/me!me!me!_daoko_feat_teddyloid.mp4"));
+void MainWindow::playVideo(QString& filepath) {
+    mediaPlayer->setMedia(QUrl::fromLocalFile(filepath));
     mediaPlayer->play();
-
-    qDebug() << videoWidget->isVisible();
 }
 
-QCamera* MainWindow::findCamera() {
+QCamera *MainWindow::findCamera() {
     const QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     if (cameras.empty()) return nullptr;
 
-    return new QCamera(cameras.at(0));
+    return new QCamera(cameras.at(0), this);
 }
 
