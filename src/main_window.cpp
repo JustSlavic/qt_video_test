@@ -8,7 +8,7 @@
 #include <QMenuBar>
 #include <QVideoWidget>
 #include <QCameraInfo>
-
+#include <QtWidgets/QFileDialog>
 
 MainWindow::MainWindow()
     : mediaPlayer(new QMediaPlayer(this))
