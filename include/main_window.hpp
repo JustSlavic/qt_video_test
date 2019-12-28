@@ -15,11 +15,11 @@ class MainWindow : public QMainWindow {
 
  public slots:
   QCamera *findCamera();
- private:
 
-  void playVideo(QString &filepath);
+ private:
   void addMenu();
 
   QMediaPlayer *mediaPlayer;
   QVideoWidget *videoWidget;
+  QCamera *camera;
 };

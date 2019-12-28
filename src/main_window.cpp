@@ -12,7 +12,7 @@
 #include <QStandardPaths>
 
 MainWindow::MainWindow()
-    : mediaPlayer(new QMediaPlayer(this)), videoWidget(new QVideoWidget()) {
+    : mediaPlayer(new QMediaPlayer(this)), videoWidget(new QVideoWidget()), camera(nullptr) {
 
   this->addMenu();
 
@@ -36,8 +36,19 @@ void MainWindow::addMenu() {
                                                          QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
                                                          tr("Video files (*.mp4 *.avi *.mkv);;All files (*)"));
     if (videoFilePath.isNull()) return;
+    if (camera) camera->stop();
 
-    this->playVideo(videoFilePath);
+    mediaPlayer->setMedia(QUrl::fromLocalFile(videoFilePath));
+    mediaPlayer->play();
+  });
+
+  connect(cameraAction, &QAction::triggered, [this]() {
+    if (!camera) camera = this->findCamera();
+
+    camera->setViewfinder(videoWidget);
+    camera->setCaptureMode(QCamera::CaptureVideo);
+
+    camera->start();
   });
 
   auto menuFilter = new QMenu("&Filter", menu);
@@ -50,11 +61,6 @@ void MainWindow::addMenu() {
 
   // MainWindow takes ownership over the QMenuBar
   this->setMenuBar(menu);
-}
-
-void MainWindow::playVideo(QString &filepath) {
-  mediaPlayer->setMedia(QUrl::fromLocalFile(filepath));
-  mediaPlayer->play();
 }
 
 QCamera *MainWindow::findCamera() {
