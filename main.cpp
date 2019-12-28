@@ -16,5 +16,11 @@ int main(int argc, char** argv) {
 
     mainWindow->show();
 
+    QMetaObject::invokeMethod(
+            mainWindow,
+            "findCamera",
+            Qt::QueuedConnection
+    );
+
     return QApplication::exec();
 }

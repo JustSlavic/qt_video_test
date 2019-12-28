@@ -12,6 +12,8 @@ set(APPLICATION_GUI include/main_window.hpp src/main_window.cpp)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Gui REQUIRED)
+find_package(Qt5Multimedia REQUIRED)
+find_package(Qt5MultimediaWidgets REQUIRED)
 
 add_executable(video_stream main.cpp
         ${APPLICATION_GUI})
@@ -19,4 +21,5 @@ add_executable(video_stream main.cpp
 target_link_libraries(video_stream Qt5::Core)
 target_link_libraries(video_stream Qt5::Widgets)
 target_link_libraries(video_stream Qt5::Gui)
-
+target_link_libraries(video_stream Qt5::Multimedia)
+target_link_libraries(video_stream Qt5::MultimediaWidgets)
