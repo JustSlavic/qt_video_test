@@ -14,12 +14,12 @@ class MainWindow : public QMainWindow {
   MainWindow();
 
  public slots:
-  QCamera* findCamera();
+  QCamera *findCamera();
  private:
 
-  void playVideo(QString& filepath);
+  void playVideo(QString &filepath);
   void addMenu();
 
-  QMediaPlayer* mediaPlayer;
-  QVideoWidget* videoWidget;
+  QMediaPlayer *mediaPlayer;
+  QVideoWidget *videoWidget;
 };

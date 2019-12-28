@@ -5,22 +5,15 @@
 
 #include "main_window.hpp"
 
+int main(int argc, char **argv) {
+  QApplication app(argc, argv);
 
-int main(int argc, char** argv) {
-    QApplication app(argc, argv);
+  auto currentPath = QCoreApplication::applicationDirPath();
+  QDir::setCurrent(currentPath);
 
-    auto currentPath = QCoreApplication::applicationDirPath();
-    QDir::setCurrent(currentPath);
+  auto mainWindow = new MainWindow();
 
-    auto mainWindow = new MainWindow();
+  mainWindow->show();
 
-    mainWindow->show();
-
-    QMetaObject::invokeMethod(
-            mainWindow,
-            "findCamera",
-            Qt::QueuedConnection
-    );
-
-    return QApplication::exec();
+  return QApplication::exec();
 }
