@@ -5,9 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_AUTOMOC ON)
 
-include_directories(include)
-
-set(APPLICATION_GUI include/main_window.hpp src/main_window.cpp)
+set(APPLICATION_GUI src/main_window.hpp src/main_window.cpp)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
