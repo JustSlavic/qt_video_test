@@ -3,7 +3,9 @@
 
 #include <QCameraInfo>
 
-VideoPlayer::VideoPlayer() : m_mediaPlayer(new QMediaPlayer(this)), m_camera(nullptr) {}
+VideoPlayer::VideoPlayer()
+    : m_mediaPlayer(new QMediaPlayer(this)),
+      m_gaussianBlur(new GaussianBlur(this)) {}
 
 void VideoPlayer::playVideoFile(const QString &filepath) {
   auto sender = dynamic_cast<MainWindow *>(QObject::sender());

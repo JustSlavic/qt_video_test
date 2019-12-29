@@ -1,11 +1,13 @@
 #ifndef VIDEO_STREAM_SRC_VIDEO_PLAYER_H_
 #define VIDEO_STREAM_SRC_VIDEO_PLAYER_H_
 
+#include "gaussian_blur.h"
+
 #include <QMediaPlayer>
 #include <QCamera>
 
 class VideoPlayer : public QObject {
-  Q_OBJECT
+ Q_OBJECT
  public:
   VideoPlayer();
 
@@ -20,7 +22,9 @@ class VideoPlayer : public QObject {
 
  private:
   QMediaPlayer *m_mediaPlayer;
-  QCamera *m_camera;
+  QCamera *m_camera{nullptr};
+
+  GaussianBlur *m_gaussianBlur;
 };
 
 #endif //VIDEO_STREAM_SRC_VIDEO_PLAYER_H_
