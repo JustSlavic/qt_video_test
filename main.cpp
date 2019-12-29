@@ -2,8 +2,10 @@
 
 #include <QApplication>
 #include <QDir>
+#include <QThread>
 
 #include "src/main_window.h"
+#include "src/video_player.h"
 
 int main(int argc, char **argv) {
   QApplication app(argc, argv);
@@ -11,7 +13,16 @@ int main(int argc, char **argv) {
   auto currentPath = QCoreApplication::applicationDirPath();
   QDir::setCurrent(currentPath);
 
+  auto videoPlayerThread = new QThread(&app);
+  auto videoPlayer = new VideoPlayer();
+
+//  videoPlayer->moveToThread(videoPlayerThread);
+//  videoPlayerThread->start();
+
   auto mainWindow = new MainWindow();
+
+  QObject::connect(mainWindow, &MainWindow::signalPlayVideoFile, videoPlayer, &VideoPlayer::playVideoFile);
+  QObject::connect(mainWindow, &MainWindow::signalPlayWebCamera, videoPlayer, &VideoPlayer::playWebCamera);
 
   mainWindow->show();
 

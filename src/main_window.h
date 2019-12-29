@@ -10,15 +10,16 @@ class MainWindow : public QMainWindow {
  public:
   MainWindow();
 
- public slots:
-  QCamera *findCamera();
+  QVideoWidget* getVideoWidget() const;
+
+ signals:
+  void signalPlayVideoFile(const QString &filepath);
+  void signalPlayWebCamera();
 
  private:
   void addMenu();
 
-  QMediaPlayer *mediaPlayer;
   QVideoWidget *videoWidget;
-  QCamera *camera;
 };
 
 #endif //VIDEO_STREAM_SRC_MAIN_WINDOW_H_

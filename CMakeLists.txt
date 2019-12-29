@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_AUTOMOC ON)
 
 set(APPLICATION_GUI src/main_window.h src/main_window.cpp)
+set(VIDEO_PLAYER src/video_player.h src/video_player.cpp)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
@@ -14,7 +15,8 @@ find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
 
 add_executable(video_stream main.cpp
-        ${APPLICATION_GUI})
+        ${APPLICATION_GUI}
+        ${VIDEO_PLAYER})
 
 target_link_libraries(video_stream Qt5::Core)
 target_link_libraries(video_stream Qt5::Widgets)
