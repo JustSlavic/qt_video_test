@@ -3,7 +3,7 @@
 #include <QApplication>
 #include <QDir>
 
-#include "src/main_window.hpp"
+#include "src/main_window.h"
 
 int main(int argc, char **argv) {
   QApplication app(argc, argv);

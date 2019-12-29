@@ -2,7 +2,7 @@
 // Created by radko on 27.12.2019.
 //
 
-#include "main_window.hpp"
+#include "main_window.h"
 
 #include <QLayout>
 #include <QMenuBar>

@@ -1,8 +1,5 @@
-//
-// Created by radko on 27.12.2019.
-//
-
-#pragma once
+#ifndef VIDEO_STREAM_SRC_MAIN_WINDOW_H_
+#define VIDEO_STREAM_SRC_MAIN_WINDOW_H_
 
 #include <QtWidgets/QMainWindow>
 #include <QtMultimedia/QMediaPlayer>
@@ -23,3 +20,5 @@ class MainWindow : public QMainWindow {
   QVideoWidget *videoWidget;
   QCamera *camera;
 };
+
+#endif //VIDEO_STREAM_SRC_MAIN_WINDOW_H_
