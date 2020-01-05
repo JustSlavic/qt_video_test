@@ -1,7 +1,8 @@
 #ifndef VIDEO_STREAM_SRC_VIDEO_PLAYER_H_
 #define VIDEO_STREAM_SRC_VIDEO_PLAYER_H_
 
-#include "gaussian_blur.h"
+#include "video_widget/gaussian_blur.h"
+#include "video_widget/output_video_surface.h"
 
 #include <QMediaPlayer>
 #include <QCamera>
@@ -25,6 +26,7 @@ class VideoPlayer : public QObject {
   QCamera *m_camera{nullptr};
 
   GaussianBlur *m_gaussianBlur;
+  OutputVideoSurface *m_outputSurface;
 };
 
 #endif //VIDEO_STREAM_SRC_VIDEO_PLAYER_H_
