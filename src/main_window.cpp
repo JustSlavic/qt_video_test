@@ -7,16 +7,17 @@
 #include <QApplication>
 #include <QLayout>
 #include <QMenuBar>
-#include <QVideoWidget>
 #include <QtWidgets/QFileDialog>
 #include <QStandardPaths>
+#include <QtWidgets/QLabel>
 
 MainWindow::MainWindow()
-    : videoWidget(new QVideoWidget()) {
+    : videoWidget(new QLabel(this)) {
 
   addMenu();
 
   videoWidget->setMinimumSize(300, 300);
+  videoWidget->setMaximumSize(1600, 900);
 
   // MainWindow takes ownership over QVideoWidget
   setCentralWidget(videoWidget);
@@ -54,7 +55,7 @@ void MainWindow::addMenu() {
   this->setMenuBar(menu);
 }
 
-QVideoWidget *MainWindow::getVideoWidget() const {
+QWidget *MainWindow::getVideoWidget() const {
   return videoWidget;
 }
 

@@ -10,7 +10,7 @@ class MainWindow : public QMainWindow {
  public:
   MainWindow();
 
-  QVideoWidget* getVideoWidget() const;
+  QWidget* getVideoWidget() const;
 
  signals:
   void signalPlayVideoFile(const QString &filepath);
@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow {
  private:
   void addMenu();
 
-  QVideoWidget *videoWidget;
+  QWidget *videoWidget;
 };
 
 #endif //VIDEO_STREAM_SRC_MAIN_WINDOW_H_

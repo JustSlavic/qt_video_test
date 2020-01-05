@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
   auto currentPath = QCoreApplication::applicationDirPath();
   QDir::setCurrent(currentPath);
 
-  auto videoPlayerThread = new QThread(&app);
+//  auto videoPlayerThread = new QThread(&app);
   auto videoPlayer = new VideoPlayer();
 
 //  videoPlayer->moveToThread(videoPlayerThread);
@@ -21,8 +21,8 @@ int main(int argc, char **argv) {
 
   auto mainWindow = new MainWindow();
 
-  QObject::connect(mainWindow, &MainWindow::signalPlayVideoFile, videoPlayer, &VideoPlayer::playVideoFile);
-  QObject::connect(mainWindow, &MainWindow::signalPlayWebCamera, videoPlayer, &VideoPlayer::playWebCamera);
+  QObject::connect(mainWindow, &MainWindow::signalPlayVideoFile, videoPlayer, &VideoPlayer::playVideoFile, Qt::QueuedConnection);
+  QObject::connect(mainWindow, &MainWindow::signalPlayWebCamera, videoPlayer, &VideoPlayer::playWebCamera, Qt::QueuedConnection);
 
   mainWindow->show();
 

@@ -1,32 +1,41 @@
 #include "video_player.h"
 #include "main_window.h"
+#include "video_widget/output_video_surface.h"
 
 #include <QCameraInfo>
 
-VideoPlayer::VideoPlayer() : m_mediaPlayer(new QMediaPlayer(this)), m_camera(nullptr) {}
+VideoPlayer::VideoPlayer()
+    : m_mediaPlayer(new QMediaPlayer(this)),
+      m_gaussianBlur(new GaussianBlur(this)),
+      m_outputSurface(new OutputVideoSurface(this)) {}
 
 void VideoPlayer::playVideoFile(const QString &filepath) {
   auto sender = dynamic_cast<MainWindow *>(QObject::sender());
-  auto widget = sender->getVideoWidget();
+  auto widget = dynamic_cast<QLabel *>(sender->getVideoWidget());
 
   stopVideoFile();
   stopWebCamera();
 
-  m_mediaPlayer->setVideoOutput(widget);
+  m_outputSurface->setOutputLabel(widget);
+
+  m_mediaPlayer->setVideoOutput(m_outputSurface);
   m_mediaPlayer->setMedia(QUrl::fromLocalFile(filepath));
   m_mediaPlayer->play();
 }
 
 void VideoPlayer::playWebCamera() {
   auto sender = dynamic_cast<MainWindow *>(QObject::sender());
-  auto widget = sender->getVideoWidget();
+  auto widget = dynamic_cast<QLabel *>(sender->getVideoWidget());
 
   stopVideoFile();
   stopWebCamera();
 
   auto camera = getCamera();
 
-  m_camera->setViewfinder(widget);
+  m_outputSurface->setOutputLabel(widget);
+  m_gaussianBlur->setVideoSurface(m_outputSurface);
+
+  m_camera->setViewfinder(m_gaussianBlur);
   m_camera->setCaptureMode(QCamera::CaptureVideo);
   m_camera->start();
 }
