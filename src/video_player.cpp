@@ -16,9 +16,10 @@ void VideoPlayer::playVideoFile(const QString &filepath) {
   stopVideoFile();
   stopWebCamera();
 
+  m_mediaPlayer->setVideoOutput(m_gaussianBlur);
+  m_gaussianBlur->setVideoSurface(m_outputSurface);
   m_outputSurface->setOutputLabel(widget);
 
-  m_mediaPlayer->setVideoOutput(m_outputSurface);
   m_mediaPlayer->setMedia(QUrl::fromLocalFile(filepath));
   m_mediaPlayer->play();
 }
@@ -32,10 +33,10 @@ void VideoPlayer::playWebCamera() {
 
   auto camera = getCamera();
 
-  m_outputSurface->setOutputLabel(widget);
-  m_gaussianBlur->setVideoSurface(m_outputSurface);
-
   m_camera->setViewfinder(m_gaussianBlur);
+  m_gaussianBlur->setVideoSurface(m_outputSurface);
+  m_outputSurface->setOutputLabel(widget);
+
   m_camera->setCaptureMode(QCamera::CaptureVideo);
   m_camera->start();
 }
