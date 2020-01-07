@@ -12,15 +12,15 @@
 #include <QtWidgets/QLabel>
 
 MainWindow::MainWindow()
-    : videoWidget(new QLabel(this)) {
+    : m_videoWidget(new QLabel(this)) {
 
   addMenu();
 
-  videoWidget->setMinimumSize(300, 300);
-  videoWidget->setMaximumSize(1600, 900);
+  m_videoWidget->setMinimumSize(300, 300);
+  m_videoWidget->setMaximumSize(1600, 900);
 
   // MainWindow takes ownership over QVideoWidget
-  setCentralWidget(videoWidget);
+  setCentralWidget(m_videoWidget);
 }
 
 void MainWindow::addMenu() {
@@ -55,7 +55,9 @@ void MainWindow::addMenu() {
   this->setMenuBar(menu);
 }
 
-QWidget *MainWindow::getVideoWidget() const {
-  return videoWidget;
+void MainWindow::drawImageOnWidget(QImage image) {
+  m_videoWidget->resize(image.size());
+  m_videoWidget->setPixmap(QPixmap::fromImage(image));
+  m_videoWidget->update();
 }
 

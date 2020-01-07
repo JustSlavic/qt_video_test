@@ -4,22 +4,24 @@
 #include <QtWidgets/QMainWindow>
 #include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QCamera>
+#include <QtWidgets/QLabel>
 
 class MainWindow : public QMainWindow {
  Q_OBJECT
  public:
   MainWindow();
 
-  QWidget* getVideoWidget() const;
-
  signals:
   void signalPlayVideoFile(const QString &filepath);
   void signalPlayWebCamera();
 
+ public slots:
+  void drawImageOnWidget(QImage);
+
  private:
   void addMenu();
 
-  QWidget *videoWidget;
+  QLabel *m_videoWidget;
 };
 
 #endif //VIDEO_STREAM_SRC_MAIN_WINDOW_H_

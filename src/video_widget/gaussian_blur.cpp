@@ -15,7 +15,7 @@ enum ColorShift {
 };
 
 GaussianBlur::GaussianBlur(QObject *parent)
-    : QAbstractVideoSurface(parent), kernel(KERNEL_SIZE, 0) {
+    : QObject(parent), kernel(KERNEL_SIZE, 0) {
 
   for (int i = 0; i < KERNEL_SIZE; ++i) {
     kernel[i] = gaussian(M, SIGMA, static_cast<double>(i));
@@ -28,17 +28,8 @@ GaussianBlur::GaussianBlur(QObject *parent)
   std::cerr << "]" << std::endl;
 }
 
-bool GaussianBlur::present(const QVideoFrame &frame) {
-//  QElapsedTimer timer;
-//  timer.start();
-
+bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
   QVideoFrame forMapping(frame);
-
-  if (!forMapping.map(QAbstractVideoBuffer::ReadOnly)) {
-    setError(ResourceError);
-    qDebug() << "Cannot map forMapping frame";
-    return false;
-  }
 
   QVideoFrame newFrame(
       forMapping.mappedBytes(),
@@ -47,7 +38,6 @@ bool GaussianBlur::present(const QVideoFrame &frame) {
       forMapping.pixelFormat());
 
   if (!newFrame.map(QAbstractPlanarVideoBuffer::WriteOnly)) {
-    setError(ResourceError);
     qDebug() << "Cannot map newly created frame";
     return false;
   }
@@ -87,26 +77,8 @@ bool GaussianBlur::present(const QVideoFrame &frame) {
   forMapping.unmap();
   newFrame.unmap();
 
-  if (m_surface) m_surface->present(newFrame);
-
+  emit signalNextFrame(newFrame);
   return true;
-}
-
-QList<QVideoFrame::PixelFormat> GaussianBlur::supportedPixelFormats(
-    QAbstractVideoBuffer::HandleType type) const {
-
-  return QList<QVideoFrame::PixelFormat>() << QVideoFrame::Format_RGB32;
-}
-
-void GaussianBlur::setVideoSurface(QAbstractVideoSurface *surface) {
-  if (m_surface && m_surface != surface && m_surface->isActive()) {
-    m_surface->stop();
-  }
-
-  m_surface = surface;
-  if (m_surface) {
-    m_surface->start(m_format);
-  }
 }
 
 double GaussianBlur::gaussian(double m, double sigma, double x) {

@@ -24,6 +24,8 @@ int main(int argc, char **argv) {
   QObject::connect(mainWindow, &MainWindow::signalPlayVideoFile, videoPlayer, &VideoPlayer::playVideoFile, Qt::QueuedConnection);
   QObject::connect(mainWindow, &MainWindow::signalPlayWebCamera, videoPlayer, &VideoPlayer::playWebCamera, Qt::QueuedConnection);
 
+  QObject::connect(videoPlayer, &VideoPlayer::signalOutputImage, mainWindow, &MainWindow::drawImageOnWidget, Qt::QueuedConnection);
+
   mainWindow->show();
 
   return QApplication::exec();
