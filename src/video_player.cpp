@@ -8,7 +8,8 @@
 VideoPlayer::VideoPlayer()
     : m_mediaPlayer(new QMediaPlayer(this)),
       m_frameEmitter(new FrameEmitter(this)),
-      m_gaussianBlur(new GaussianBlur(this)),
+      m_gaussianBlur(new GaussianBlur()),
+      m_gaussianBlurThread(new QThread(this)),
       m_outputSurface(new OutputVideoSurface()),
       m_outputSurfaceThread(new QThread(this)) {
 
@@ -20,8 +21,12 @@ VideoPlayer::VideoPlayer()
 
   m_mediaPlayer->setVideoOutput(m_frameEmitter);
 
-  connect(m_frameEmitter, &FrameEmitter::signalNextFrame, m_outputSurface, &OutputVideoSurface::receiveNextFrame, Qt::QueuedConnection);
+  connect(m_frameEmitter, &FrameEmitter::signalNextFrame, m_gaussianBlur, &GaussianBlur::receiveNextFrame, Qt::QueuedConnection);
+  connect(m_gaussianBlur, &GaussianBlur::signalNextFrame, m_outputSurface, &OutputVideoSurface::receiveNextFrame, Qt::QueuedConnection);
   connect(m_outputSurface, &OutputVideoSurface::signalOutputImage, this, &VideoPlayer::signalOutputImage, Qt::QueuedConnection);
+
+  m_gaussianBlur->moveToThread(m_gaussianBlurThread);
+  m_gaussianBlurThread->start();
 
   m_outputSurface->moveToThread(m_outputSurfaceThread);
   m_outputSurfaceThread->start();

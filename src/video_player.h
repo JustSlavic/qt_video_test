@@ -30,6 +30,7 @@ class VideoPlayer : public QObject {
 
   FrameEmitter *m_frameEmitter;
   GaussianBlur *m_gaussianBlur;
+  QThread *m_gaussianBlurThread;
   OutputVideoSurface *m_outputSurface;
   QThread *m_outputSurfaceThread;
 };

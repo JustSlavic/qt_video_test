@@ -31,6 +31,11 @@ GaussianBlur::GaussianBlur(QObject *parent)
 bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
   QVideoFrame forMapping(frame);
 
+  if (!forMapping.map(QAbstractVideoBuffer::ReadOnly)) {
+    qDebug() << "Cannot map forMapping frame";
+    return false;
+  }
+
   QVideoFrame newFrame(
       forMapping.mappedBytes(),
       forMapping.size(),
@@ -53,18 +58,39 @@ bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
   int width = forMapping.width();
 
   int boundary = (KERNEL_SIZE - 1)/2;
-  for (int i = 0; i < forMapping.height(); ++i) {
-    for (int j = boundary; j < forMapping.width() - boundary; ++j) {
+  for (int i = 0; i < height; ++i) {
+    for (int j = boundary; j < width - boundary; ++j) {
       double averageA = 0;
       double averageR = 0;
       double averageG = 0;
       double averageB = 0;
 
       for (int s = 0; s < KERNEL_SIZE; ++s) {
-        averageA += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + A_SHIFT);
-        averageR += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + R_SHIFT);
-        averageG += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + G_SHIFT);
-        averageB += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + B_SHIFT);
+        averageA += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + A_SHIFT);
+        averageR += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + R_SHIFT);
+        averageG += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + G_SHIFT);
+        averageB += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + B_SHIFT);
+      }
+
+      *(newBytes + i*bytesPerLine + j*4 + A_SHIFT) = static_cast<uchar>(averageA);
+      *(newBytes + i*bytesPerLine + j*4 + R_SHIFT) = static_cast<uchar>(averageR);
+      *(newBytes + i*bytesPerLine + j*4 + G_SHIFT) = static_cast<uchar>(averageG);
+      *(newBytes + i*bytesPerLine + j*4 + B_SHIFT) = static_cast<uchar>(averageB);
+    }
+  }
+
+  for (int j = 0; j < width; ++j) {
+    for (int i = boundary; i < height - boundary; ++i) {
+      double averageA = 0;
+      double averageR = 0;
+      double averageG = 0;
+      double averageB = 0;
+
+      for (int s = 0; s < KERNEL_SIZE; ++s) {
+        averageA += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + A_SHIFT);
+        averageR += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + R_SHIFT);
+        averageG += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + G_SHIFT);
+        averageB += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + B_SHIFT);
       }
 
       *(newBytes + i*bytesPerLine + j*4 + A_SHIFT) = static_cast<uchar>(averageA);
