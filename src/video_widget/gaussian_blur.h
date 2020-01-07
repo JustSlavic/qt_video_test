@@ -19,12 +19,13 @@ class GaussianBlur : public QAbstractVideoSurface {
   QAbstractVideoSurface *m_surface{nullptr};
   QVideoSurfaceFormat m_format;
 
+  static double gaussian(double m, double sigma, double x);
   static double gaussian(double m, double sigma, double x, double y);
 
-  const double M = 1;
-  const double SIGMA = 1;
-  const int B_SIZE = 3;
-  QVector<QVector<double>> matrix;
+  const double M = 3;
+  const double SIGMA = 2;
+  const int KERNEL_SIZE = 7;
+  QVector<double> kernel;
 };
 
 #endif //VIDEO_STREAM_SRC_GAUSSIAN_BLUR_H_

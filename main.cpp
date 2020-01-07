@@ -13,11 +13,11 @@ int main(int argc, char **argv) {
   auto currentPath = QCoreApplication::applicationDirPath();
   QDir::setCurrent(currentPath);
 
-  auto videoPlayerThread = new QThread(&app);
+//  auto videoPlayerThread = new QThread(&app);
   auto videoPlayer = new VideoPlayer();
 
-  videoPlayer->moveToThread(videoPlayerThread);
-  videoPlayerThread->start();
+//  videoPlayer->moveToThread(videoPlayerThread);
+//  videoPlayerThread->start();
 
   auto mainWindow = new MainWindow();
 

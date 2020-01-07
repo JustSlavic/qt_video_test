@@ -15,18 +15,22 @@ enum ColorShift {
 };
 
 GaussianBlur::GaussianBlur(QObject *parent)
-    : QAbstractVideoSurface(parent), matrix(B_SIZE, QVector<double>(B_SIZE, 0)) {
+    : QAbstractVideoSurface(parent), kernel(KERNEL_SIZE, 0) {
 
-  for (int i = 0; i < B_SIZE; ++i) {
-    for (int j = 0; j < B_SIZE; ++j) {
-      matrix[i][j] = gaussian(M, SIGMA, static_cast<double>(i), static_cast<double>(j));
-    }
+  for (int i = 0; i < KERNEL_SIZE; ++i) {
+    kernel[i] = gaussian(M, SIGMA, static_cast<double>(i));
   }
+
+  std::cerr << "kernel: [";
+  for (int i = 0; i < KERNEL_SIZE; ++i) {
+    std::cerr << kernel[i] << " ";
+  }
+  std::cerr << "]" << std::endl;
 }
 
 bool GaussianBlur::present(const QVideoFrame &frame) {
-  QElapsedTimer timer;
-  timer.start();
+//  QElapsedTimer timer;
+//  timer.start();
 
   QVideoFrame forMapping(frame);
 
@@ -51,57 +55,37 @@ bool GaussianBlur::present(const QVideoFrame &frame) {
   uchar *oldBytes = forMapping.bits();
   uchar *newBytes = newFrame.bits();
 
-//  std::memcpy(newBytes, oldBytes, forMapping.mappedBytes());
+  std::memcpy(newBytes, oldBytes, forMapping.mappedBytes());
 
   int bytesOverall = forMapping.mappedBytes();
   int bytesPerLine = forMapping.bytesPerLine();
   int height = forMapping.height();
   int width = forMapping.width();
 
-  for (int i = 1; i < forMapping.height() - 1; ++i) {
-    for (int j = 1; j < forMapping.width() - 1; ++j) {
+  int boundary = (KERNEL_SIZE - 1)/2;
+  for (int i = 0; i < forMapping.height(); ++i) {
+    for (int j = boundary; j < forMapping.width() - boundary; ++j) {
       double averageA = 0;
       double averageR = 0;
       double averageG = 0;
       double averageB = 0;
 
-      for (int s = 0; s < B_SIZE; ++s) {
-        for (int t = 0; t < B_SIZE; ++t) {
-          averageA += matrix[s][t] * *(oldBytes + (i + s - 1)*bytesPerLine + (j + t - 1)*4 + A_SHIFT);
-          averageR += matrix[s][t] * *(oldBytes + (i + s - 1)*bytesPerLine + (j + t - 1)*4 + R_SHIFT);
-          averageG += matrix[s][t] * *(oldBytes + (i + s - 1)*bytesPerLine + (j + t - 1)*4 + G_SHIFT);
-          averageB += matrix[s][t] * *(oldBytes + (i + s - 1)*bytesPerLine + (j + t - 1)*4 + B_SHIFT);
-
-//          averageA = *(oldBytes + i*bytesPerLine + j*4 + A_SHIFT);
-//          averageR = *(oldBytes + i*bytesPerLine + j*4 + R_SHIFT);
-//          averageG = *(oldBytes + i*bytesPerLine + j*4 + G_SHIFT);
-//          averageB = *(oldBytes + i*bytesPerLine + j*4 + B_SHIFT);
-        }
+      for (int s = 0; s < KERNEL_SIZE; ++s) {
+        averageA += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + A_SHIFT);
+        averageR += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + R_SHIFT);
+        averageG += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + G_SHIFT);
+        averageB += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - 1)*4 + B_SHIFT);
       }
 
       *(newBytes + i*bytesPerLine + j*4 + A_SHIFT) = static_cast<uchar>(averageA);
-
-//      qDebug() << "old: ("
-//        << (i*bytesPerLine + j*4 + R_SHIFT) << ", "
-//        << (i*bytesPerLine + j*4 + G_SHIFT) << ", "
-//        << (i*bytesPerLine + j*4 + B_SHIFT) << ") "
-//        << " new: ("
-//        << static_cast<uchar>(averageR) << ", "
-//        << static_cast<uchar>(averageG) << ", "
-//        << static_cast<uchar>(averageB) << ") ";
-
       *(newBytes + i*bytesPerLine + j*4 + R_SHIFT) = static_cast<uchar>(averageR);
       *(newBytes + i*bytesPerLine + j*4 + G_SHIFT) = static_cast<uchar>(averageG);
       *(newBytes + i*bytesPerLine + j*4 + B_SHIFT) = static_cast<uchar>(averageB);
     }
   }
 
-//  QThread::msleep(500);
-
   forMapping.unmap();
   newFrame.unmap();
-
-  qDebug() << "The gaussian blur took" << timer.elapsed() << " milliseconds";
 
   if (m_surface) m_surface->present(newFrame);
 
@@ -123,6 +107,12 @@ void GaussianBlur::setVideoSurface(QAbstractVideoSurface *surface) {
   if (m_surface) {
     m_surface->start(m_format);
   }
+}
+
+double GaussianBlur::gaussian(double m, double sigma, double x) {
+  double exponential = -((x - m) * (x - m) / (2 * sigma * sigma));
+  double normalize_coefficient = std::sqrt(2 * M_PI) * sigma;
+  return std::exp(exponential) / normalize_coefficient;
 }
 
 double GaussianBlur::gaussian(double m, double sigma, double x, double y) {
