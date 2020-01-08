@@ -29,6 +29,11 @@ GaussianBlur::GaussianBlur(QObject *parent)
 }
 
 bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
+  if (!active) {
+    emit signalNextFrame(frame);
+    return true;
+  }
+
   QVideoFrame forMapping(frame);
 
   if (!forMapping.map(QAbstractVideoBuffer::ReadOnly)) {
@@ -118,4 +123,8 @@ double GaussianBlur::gaussian(double m, double sigma, double x, double y) {
   double normalize_coefficient = 2 * M_PI * sigma * sigma;
 
   return std::exp(exponential) / normalize_coefficient;
+}
+
+bool GaussianBlur::toggle() {
+  return active = !active;
 }

@@ -44,9 +44,15 @@ void MainWindow::addMenu() {
   connect(exitAction, &QAction::triggered, []{ QApplication::quit(); });
 
   auto menuFilter = new QMenu("&Filter", menu);
-  menuFilter->addAction("&No filter");
-  menuFilter->addAction("&Gaussian blur");
-  menuFilter->addAction("&Sobel operator");
+  auto gaussianAction = menuFilter->addAction("&Gaussian blur");
+  gaussianAction->setCheckable(true);
+  gaussianAction->setChecked(false);
+  auto sobelAction = menuFilter->addAction("&Sobel operator");
+  sobelAction->setCheckable(true);
+  sobelAction->setChecked(false);
+
+  connect(gaussianAction, &QAction::triggered, this, &MainWindow::signalToggleGaussianFilter, Qt::QueuedConnection);
+  connect(sobelAction, &QAction::triggered, this, &MainWindow::signalToggleSobelFilter, Qt::QueuedConnection);
 
   menu->addMenu(menuFile);
   menu->addMenu(menuFilter);

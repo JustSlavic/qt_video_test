@@ -15,6 +15,9 @@ class MainWindow : public QMainWindow {
   void signalPlayVideoFile(const QString &filepath);
   void signalPlayWebCamera();
 
+  void signalToggleGaussianFilter();
+  void signalToggleSobelFilter();
+
  public slots:
   void drawImageOnWidget(QImage);
 

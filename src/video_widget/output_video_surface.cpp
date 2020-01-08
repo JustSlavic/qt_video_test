@@ -22,6 +22,6 @@ bool OutputVideoSurface::receiveNextFrame(const QVideoFrame &frame) {
 
   toDraw.unmap();
 
-  emit signalOutputImage(std::move(image));
+  emit signalOutputImage(image);
   return true;
 }

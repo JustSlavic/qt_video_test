@@ -13,6 +13,7 @@ class GaussianBlur : public QObject {
 
  public slots:
   bool receiveNextFrame(const QVideoFrame &);
+  bool toggle();
 
  private:
   QVideoSurfaceFormat m_format;
@@ -24,6 +25,8 @@ class GaussianBlur : public QObject {
   const double SIGMA = 2;
   const int KERNEL_SIZE = 9;
   QVector<double> kernel;
+
+  bool active{false};
 };
 
 #endif //VIDEO_STREAM_SRC_GAUSSIAN_BLUR_H_

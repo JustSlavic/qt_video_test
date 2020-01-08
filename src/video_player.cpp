@@ -13,17 +13,35 @@ VideoPlayer::VideoPlayer()
       m_outputSurface(new OutputVideoSurface()),
       m_outputSurfaceThread(new QThread(this)) {
 
-  // connect frameEmitter -> gaussianBlur
-  // connect gaussianBlur -> sobelOperator
-  // connect sobelOperator-> outputSurface
-  // connect outputSurface-> videoPlayer::signalNextFrame
-  // connect videoPlayer  -> mainWindow::drawImageOnWidget
-
   m_mediaPlayer->setVideoOutput(m_frameEmitter);
 
-  connect(m_frameEmitter, &FrameEmitter::signalNextFrame, m_gaussianBlur, &GaussianBlur::receiveNextFrame, Qt::QueuedConnection);
-  connect(m_gaussianBlur, &GaussianBlur::signalNextFrame, m_outputSurface, &OutputVideoSurface::receiveNextFrame, Qt::QueuedConnection);
-  connect(m_outputSurface, &OutputVideoSurface::signalOutputImage, this, &VideoPlayer::signalOutputImage, Qt::QueuedConnection);
+  getCamera();
+  if (m_camera) {
+    m_camera->setViewfinder(m_frameEmitter);
+    m_camera->setCaptureMode(QCamera::CaptureVideo);
+  }
+
+  connect(m_frameEmitter,
+          &FrameEmitter::signalNextFrame,
+          m_gaussianBlur,
+          &GaussianBlur::receiveNextFrame,
+          Qt::QueuedConnection);
+  connect(m_gaussianBlur,
+          &GaussianBlur::signalNextFrame,
+          m_outputSurface,
+          &OutputVideoSurface::receiveNextFrame,
+          Qt::QueuedConnection);
+  connect(m_outputSurface,
+          &OutputVideoSurface::signalOutputImage,
+          this,
+          &VideoPlayer::signalOutputImage,
+          Qt::QueuedConnection);
+
+  connect(this,
+          &VideoPlayer::signalToggleGaussianFilter,
+          m_gaussianBlur,
+          &GaussianBlur::toggle,
+          Qt::QueuedConnection);
 
   m_gaussianBlur->moveToThread(m_gaussianBlurThread);
   m_gaussianBlurThread->start();
@@ -33,26 +51,15 @@ VideoPlayer::VideoPlayer()
 }
 
 void VideoPlayer::playVideoFile(const QString &filepath) {
+  if (m_camera) m_camera->stop();
   m_mediaPlayer->stop();
   m_mediaPlayer->setMedia(QUrl::fromLocalFile(filepath));
   m_mediaPlayer->play();
 }
 
 void VideoPlayer::playWebCamera() {
-//  auto sender = dynamic_cast<MainWindow *>(QObject::sender());
-//  auto widget = dynamic_cast<QLabel *>(sender->getVideoWidget());
-//
-//  stopVideoFile();
-//  stopWebCamera();
-//
-//  auto camera = getCamera();
-//
-//  m_camera->setViewfinder(m_gaussianBlur);
-//  m_gaussianBlur->setVideoSurface(m_outputSurface);
-//  m_outputSurface->setOutputLabel(widget);
-//
-//  m_camera->setCaptureMode(QCamera::CaptureVideo);
-//  m_camera->start();
+  m_mediaPlayer->stop();
+  if (m_camera) m_camera->start();
 }
 
 QCamera *VideoPlayer::getCamera() {
@@ -63,10 +70,3 @@ QCamera *VideoPlayer::getCamera() {
 
   return m_camera;
 }
-
-void VideoPlayer::stopWebCamera() {
-  if (!m_camera) return;
-
-  m_camera->stop();
-}
-
