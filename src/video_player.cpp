@@ -87,11 +87,17 @@ QCamera *VideoPlayer::getCamera() {
 }
 
 void VideoPlayer::loadImageFile(const QString &filepath) {
-  QImage image(filepath);
-  if (image.isNull()) return;
+  m_lastImage.load(filepath);
+  if (m_lastImage.isNull()) return;
 
   m_mediaPlayer->stop();
   if (m_camera) m_camera->stop();
 
-  emit signalPassImage(image);
+  emit signalPassImage(m_lastImage);
+}
+
+void VideoPlayer::updateLastImage() {
+  if (!m_lastImage.isNull()) {
+    emit signalPassImage(m_lastImage);
+  }
 }

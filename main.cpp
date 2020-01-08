@@ -53,6 +53,11 @@ int main(int argc, char **argv) {
                    mainWindow,
                    &MainWindow::drawImageOnWidget,
                    Qt::QueuedConnection);
+  QObject::connect(mainWindow,
+                   &MainWindow::signalUpdateLastImage,
+                   videoPlayer,
+                   &VideoPlayer::updateLastImage,
+                   Qt::QueuedConnection);
 
   mainWindow->show();
 

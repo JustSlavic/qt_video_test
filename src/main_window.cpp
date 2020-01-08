@@ -16,7 +16,7 @@ MainWindow::MainWindow()
 
   addMenu();
 
-  m_videoWidget->setMinimumSize(300, 300);
+  m_videoWidget->setMinimumSize(1280, 720);
   m_videoWidget->setMaximumSize(1600, 900);
 
   // MainWindow takes ownership over QVideoWidget
@@ -72,8 +72,16 @@ void MainWindow::addMenu() {
   sobelAction->setCheckable(true);
   sobelAction->setChecked(false);
 
-  connect(gaussianAction, &QAction::triggered, this, &MainWindow::signalToggleGaussianFilter, Qt::QueuedConnection);
-  connect(sobelAction, &QAction::triggered, this, &MainWindow::signalToggleSobelFilter, Qt::QueuedConnection);
+  connect(gaussianAction, &QAction::triggered, [this] {
+    emit signalToggleGaussianFilter();
+
+    if (m_state == State::ImageFile) emit signalUpdateLastImage();
+  });
+  connect(sobelAction, &QAction::triggered, [this] {
+    emit signalToggleSobelFilter();
+
+    if (m_state == State::ImageFile) emit signalUpdateLastImage();
+  });
 
   menu->addMenu(menuFile);
   menu->addMenu(menuFilter);

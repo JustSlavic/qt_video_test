@@ -20,6 +20,7 @@ class MainWindow : public QMainWindow {
 
  signals:
   void signalLoadImageFile(const QString &filepath);
+  void signalUpdateLastImage();
   void signalPlayVideoFile(const QString &filepath);
   void signalPlayWebCamera();
 
