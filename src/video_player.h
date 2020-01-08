@@ -28,9 +28,6 @@ class VideoPlayer : public QObject {
   void playWebCamera();
 
  private:
-  QCamera *getCamera();
-
- private:
   QMediaPlayer *m_mediaPlayer;
   QCamera *m_camera{nullptr};
 

@@ -17,8 +17,9 @@ VideoPlayer::VideoPlayer()
 
   m_mediaPlayer->setVideoOutput(m_frameEmitter);
 
-  getCamera();
-  if (m_camera) {
+  auto cameraInfo = QCameraInfo::defaultCamera();
+  if (!cameraInfo.isNull()) {
+    m_camera = new QCamera(cameraInfo, this);
     m_camera->setViewfinder(m_frameEmitter);
     m_camera->setCaptureMode(QCamera::CaptureVideo);
   }
@@ -95,15 +96,6 @@ void VideoPlayer::playVideoFile(const QString &filepath) {
 void VideoPlayer::playWebCamera() {
   m_mediaPlayer->stop();
   if (m_camera) m_camera->start();
-}
-
-QCamera *VideoPlayer::getCamera() {
-  if (!m_camera) {
-    auto cameraInfo = QCameraInfo::defaultCamera();
-    m_camera = new QCamera(cameraInfo, this);
-  }
-
-  return m_camera;
 }
 
 void VideoPlayer::loadImageFile(const QString &filepath) {
