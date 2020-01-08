@@ -3,6 +3,7 @@
 
 #include "video_widget/frame_emitter.h"
 #include "video_widget/gaussian_blur.h"
+#include "video_widget/sobel_operator.h"
 #include "video_widget/output_video_surface.h"
 
 #include <QMediaPlayer>
@@ -36,6 +37,8 @@ class VideoPlayer : public QObject {
   FrameEmitter *m_frameEmitter;
   GaussianBlur *m_gaussianBlur;
   QThread *m_gaussianBlurThread;
+  SobelOperator *m_sobelOperator;
+  QThread *m_sobelOperatorThread;
   OutputVideoSurface *m_outputSurface;
   QThread *m_outputSurfaceThread;
   QImage m_lastImage;
