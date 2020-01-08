@@ -10,6 +10,8 @@ VideoPlayer::VideoPlayer()
       m_frameEmitter(new FrameEmitter(this)),
       m_gaussianBlur(new GaussianBlur()),
       m_gaussianBlurThread(new QThread(this)),
+      m_sobelOperator(new SobelOperator()),
+      m_sobelOperatorThread(new QThread(this)),
       m_outputSurface(new OutputVideoSurface()),
       m_outputSurfaceThread(new QThread(this)) {
 
@@ -33,6 +35,11 @@ VideoPlayer::VideoPlayer()
           Qt::QueuedConnection);
   connect(m_gaussianBlur,
           &GaussianBlur::signalPassImage,
+          m_sobelOperator,
+          &SobelOperator::receiveImage,
+          Qt::QueuedConnection);
+  connect(m_sobelOperator,
+          &SobelOperator::signalPassImage,
           m_outputSurface,
           &OutputVideoSurface::signalOutputImage);
 
@@ -43,6 +50,11 @@ VideoPlayer::VideoPlayer()
           Qt::QueuedConnection);
   connect(m_gaussianBlur,
           &GaussianBlur::signalNextFrame,
+          m_sobelOperator,
+          &SobelOperator::receiveNextFrame,
+          Qt::QueuedConnection);
+  connect(m_sobelOperator,
+          &SobelOperator::signalNextFrame,
           m_outputSurface,
           &OutputVideoSurface::receiveNextFrame,
           Qt::QueuedConnection);
@@ -57,9 +69,17 @@ VideoPlayer::VideoPlayer()
           m_gaussianBlur,
           &GaussianBlur::toggle,
           Qt::QueuedConnection);
+  connect(this,
+          &VideoPlayer::signalToggleSobelFilter,
+          m_sobelOperator,
+          &SobelOperator::toggle,
+          Qt::QueuedConnection);
 
   m_gaussianBlur->moveToThread(m_gaussianBlurThread);
   m_gaussianBlurThread->start();
+
+  m_sobelOperator->moveToThread(m_sobelOperatorThread);
+  m_sobelOperatorThread->start();
 
   m_outputSurface->moveToThread(m_outputSurfaceThread);
   m_outputSurfaceThread->start();

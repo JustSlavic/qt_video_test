@@ -130,7 +130,9 @@ double GaussianBlur::gaussian(double m, double sigma, double x, double y) {
 }
 
 bool GaussianBlur::toggle() {
-  return active = !active;
+  active = !active;
+  qDebug() << "Gaussian blur turned " << (active ? "on" : "off");
+  return active;
 }
 
 bool GaussianBlur::receiveImage(QImage oldImage) {
