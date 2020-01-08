@@ -20,9 +20,13 @@ class SobelOperator : public QObject {
   bool toggle();
 
  private:
-  QVector<QVector<int>> m_kernelX;
-  QVector<QVector<int>> m_kernelY;
-  QVector<QVector<double>> G;
+  void applyOperator(const uchar *oldBytes, uchar *newBytes, int height, int width);
+
+  const QVector<QVector<int>> m_kernelX;
+  const QVector<QVector<int>> m_kernelY;
+
+  int *Gx;
+  int *Gy;
 
   bool active{false};
 };
