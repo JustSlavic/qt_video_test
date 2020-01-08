@@ -22,6 +22,11 @@ int main(int argc, char **argv) {
   auto mainWindow = new MainWindow();
 
   QObject::connect(mainWindow,
+                   &MainWindow::signalLoadImageFile,
+                   videoPlayer,
+                   &VideoPlayer::loadImageFile,
+                   Qt::QueuedConnection);
+  QObject::connect(mainWindow,
                    &MainWindow::signalPlayVideoFile,
                    videoPlayer,
                    &VideoPlayer::playVideoFile,

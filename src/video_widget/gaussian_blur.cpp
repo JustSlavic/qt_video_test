@@ -128,3 +128,7 @@ double GaussianBlur::gaussian(double m, double sigma, double x, double y) {
 bool GaussianBlur::toggle() {
   return active = !active;
 }
+bool GaussianBlur::receiveImage(QImage image) {
+  emit signalPassImage(image);
+  return true;
+}

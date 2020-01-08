@@ -9,9 +9,17 @@
 class MainWindow : public QMainWindow {
  Q_OBJECT
  public:
+  enum class State {
+    Idle,
+    ImageFile,
+    VideoFile,
+    Camera,
+  };
+
   MainWindow();
 
  signals:
+  void signalLoadImageFile(const QString &filepath);
   void signalPlayVideoFile(const QString &filepath);
   void signalPlayWebCamera();
 
@@ -25,6 +33,7 @@ class MainWindow : public QMainWindow {
   void addMenu();
 
   QLabel *m_videoWidget;
+  State m_state{State::Idle};
 };
 
 #endif //VIDEO_STREAM_SRC_MAIN_WINDOW_H_

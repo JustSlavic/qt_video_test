@@ -14,12 +14,14 @@ class VideoPlayer : public QObject {
   VideoPlayer();
 
  signals:
+  void signalPassImage(QImage);
   void signalOutputImage(QImage);
 
   void signalToggleGaussianFilter();
   void signalToggleSobelFilter();
 
  public slots:
+  void loadImageFile(const QString &filepath);
   void playVideoFile(const QString &filepath);
   void playWebCamera();
 

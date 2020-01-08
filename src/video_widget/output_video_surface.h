@@ -14,6 +14,7 @@ class OutputVideoSurface : public QObject {
   void signalOutputImage(QImage);
 
  public slots:
+  bool receiveImage(QImage);
   bool receiveNextFrame(const QVideoFrame &frame);
 };
 

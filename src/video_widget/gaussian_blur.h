@@ -10,9 +10,11 @@ class GaussianBlur : public QObject {
 
  signals:
   void signalNextFrame(const QVideoFrame &);
+  void signalPassImage(QImage);
 
  public slots:
   bool receiveNextFrame(const QVideoFrame &);
+  bool receiveImage(QImage);
   bool toggle();
 
  private:
