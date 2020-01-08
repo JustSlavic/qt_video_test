@@ -23,6 +23,8 @@ class GaussianBlur : public QObject {
   static double gaussian(double m, double sigma, double x);
   static double gaussian(double m, double sigma, double x, double y);
 
+  void blur(const uchar *oldBytes, uchar *newBytes, int height, int width);
+
   const double M = 4;
   const double SIGMA = 2;
   const int KERNEL_SIZE = 9;

@@ -57,12 +57,22 @@ bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
 
   std::memcpy(newBytes, oldBytes, forMapping.mappedBytes());
 
-  int bytesOverall = forMapping.mappedBytes();
-  int bytesPerLine = forMapping.bytesPerLine();
   int height = forMapping.height();
   int width = forMapping.width();
 
-  int boundary = (KERNEL_SIZE - 1)/2;
+  blur(oldBytes, newBytes, height, width);
+
+  forMapping.unmap();
+  newFrame.unmap();
+
+  emit signalNextFrame(newFrame);
+  return true;
+}
+
+void GaussianBlur::blur(const uchar *oldBytes, uchar *newBytes, int height, int width) {
+  int bytesPerLine = width * 4;
+
+  int boundary = (KERNEL_SIZE - 1) / 2;
   for (int i = 0; i < height; ++i) {
     for (int j = boundary; j < width - boundary; ++j) {
       double averageA = 0;
@@ -71,16 +81,16 @@ bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
       double averageB = 0;
 
       for (int s = 0; s < KERNEL_SIZE; ++s) {
-        averageA += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + A_SHIFT);
-        averageR += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + R_SHIFT);
-        averageG += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + G_SHIFT);
-        averageB += kernel[s] * *(oldBytes + i*bytesPerLine + (j + s - boundary)*4 + B_SHIFT);
+        averageA += kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + A_SHIFT);
+        averageR += kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + R_SHIFT);
+        averageG += kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + G_SHIFT);
+        averageB += kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + B_SHIFT);
       }
 
-      *(newBytes + i*bytesPerLine + j*4 + A_SHIFT) = static_cast<uchar>(averageA);
-      *(newBytes + i*bytesPerLine + j*4 + R_SHIFT) = static_cast<uchar>(averageR);
-      *(newBytes + i*bytesPerLine + j*4 + G_SHIFT) = static_cast<uchar>(averageG);
-      *(newBytes + i*bytesPerLine + j*4 + B_SHIFT) = static_cast<uchar>(averageB);
+      *(newBytes + i * bytesPerLine + j * 4 + A_SHIFT) = static_cast<uchar>(averageA);
+      *(newBytes + i * bytesPerLine + j * 4 + R_SHIFT) = static_cast<uchar>(averageR);
+      *(newBytes + i * bytesPerLine + j * 4 + G_SHIFT) = static_cast<uchar>(averageG);
+      *(newBytes + i * bytesPerLine + j * 4 + B_SHIFT) = static_cast<uchar>(averageB);
     }
   }
 
@@ -92,24 +102,18 @@ bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
       double averageB = 0;
 
       for (int s = 0; s < KERNEL_SIZE; ++s) {
-        averageA += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + A_SHIFT);
-        averageR += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + R_SHIFT);
-        averageG += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + G_SHIFT);
-        averageB += kernel[s] * *(newBytes + (i + s - boundary)*bytesPerLine + j*4 + B_SHIFT);
+        averageA += kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + A_SHIFT);
+        averageR += kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + R_SHIFT);
+        averageG += kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + G_SHIFT);
+        averageB += kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + B_SHIFT);
       }
 
-      *(newBytes + i*bytesPerLine + j*4 + A_SHIFT) = static_cast<uchar>(averageA);
-      *(newBytes + i*bytesPerLine + j*4 + R_SHIFT) = static_cast<uchar>(averageR);
-      *(newBytes + i*bytesPerLine + j*4 + G_SHIFT) = static_cast<uchar>(averageG);
-      *(newBytes + i*bytesPerLine + j*4 + B_SHIFT) = static_cast<uchar>(averageB);
+      *(newBytes + i * bytesPerLine + j * 4 + A_SHIFT) = static_cast<uchar>(averageA);
+      *(newBytes + i * bytesPerLine + j * 4 + R_SHIFT) = static_cast<uchar>(averageR);
+      *(newBytes + i * bytesPerLine + j * 4 + G_SHIFT) = static_cast<uchar>(averageG);
+      *(newBytes + i * bytesPerLine + j * 4 + B_SHIFT) = static_cast<uchar>(averageB);
     }
   }
-
-  forMapping.unmap();
-  newFrame.unmap();
-
-  emit signalNextFrame(newFrame);
-  return true;
 }
 
 double GaussianBlur::gaussian(double m, double sigma, double x) {
@@ -128,7 +132,29 @@ double GaussianBlur::gaussian(double m, double sigma, double x, double y) {
 bool GaussianBlur::toggle() {
   return active = !active;
 }
-bool GaussianBlur::receiveImage(QImage image) {
-  emit signalPassImage(image);
+
+bool GaussianBlur::receiveImage(QImage oldImage) {
+  if (!active) {
+    emit signalPassImage(oldImage);
+    return true;
+  }
+
+  QImage newImage(
+      oldImage.width(),
+      oldImage.height(),
+      oldImage.format());
+
+  uchar *oldBytes = oldImage.bits();
+  uchar *newBytes = newImage.bits();
+
+  int byteCount = oldImage.byteCount();
+  int width = oldImage.width();
+  int height = oldImage.height();
+
+  std::memcpy(newBytes, oldBytes, byteCount);
+
+  blur(oldBytes, newBytes, height, width);
+
+  emit signalPassImage(newImage);
   return true;
 }
