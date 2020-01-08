@@ -25,3 +25,6 @@ bool OutputVideoSurface::receiveNextFrame(const QVideoFrame &frame) {
   emit signalOutputImage(image);
   return true;
 }
+bool OutputVideoSurface::receiveImage(QImage) {
+  return false;
+}

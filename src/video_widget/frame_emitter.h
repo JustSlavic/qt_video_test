@@ -14,6 +14,7 @@ class FrameEmitter : public QAbstractVideoSurface {
   bool present(const QVideoFrame &frame) override;
 
  signals:
+  void signalPassImage(QImage);
   void signalNextFrame(const QVideoFrame &);
 };
 

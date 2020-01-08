@@ -21,6 +21,21 @@ VideoPlayer::VideoPlayer()
     m_camera->setCaptureMode(QCamera::CaptureVideo);
   }
 
+  connect(this,
+          &VideoPlayer::signalPassImage,
+          m_frameEmitter,
+          &FrameEmitter::signalPassImage,
+          Qt::QueuedConnection);
+  connect(m_frameEmitter,
+          &FrameEmitter::signalPassImage,
+          m_gaussianBlur,
+          &GaussianBlur::receiveImage,
+          Qt::QueuedConnection);
+  connect(m_gaussianBlur,
+          &GaussianBlur::signalPassImage,
+          m_outputSurface,
+          &OutputVideoSurface::signalOutputImage);
+
   connect(m_frameEmitter,
           &FrameEmitter::signalNextFrame,
           m_gaussianBlur,
@@ -69,4 +84,20 @@ QCamera *VideoPlayer::getCamera() {
   }
 
   return m_camera;
+}
+
+void VideoPlayer::loadImageFile(const QString &filepath) {
+  m_lastImage.load(filepath);
+  if (m_lastImage.isNull()) return;
+
+  m_mediaPlayer->stop();
+  if (m_camera) m_camera->stop();
+
+  emit signalPassImage(m_lastImage);
+}
+
+void VideoPlayer::updateLastImage() {
+  if (!m_lastImage.isNull()) {
+    emit signalPassImage(m_lastImage);
+  }
 }

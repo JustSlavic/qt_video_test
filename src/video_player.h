@@ -14,12 +14,15 @@ class VideoPlayer : public QObject {
   VideoPlayer();
 
  signals:
+  void signalPassImage(QImage);
   void signalOutputImage(QImage);
 
   void signalToggleGaussianFilter();
   void signalToggleSobelFilter();
 
  public slots:
+  void loadImageFile(const QString &filepath);
+  void updateLastImage();
   void playVideoFile(const QString &filepath);
   void playWebCamera();
 
@@ -35,6 +38,7 @@ class VideoPlayer : public QObject {
   QThread *m_gaussianBlurThread;
   OutputVideoSurface *m_outputSurface;
   QThread *m_outputSurfaceThread;
+  QImage m_lastImage;
 };
 
 #endif //VIDEO_STREAM_SRC_VIDEO_PLAYER_H_
