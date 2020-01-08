@@ -2,24 +2,9 @@
 
 #include <QDebug>
 
-OutputVideoSurface::OutputVideoSurface(QObject *parent) : QAbstractVideoSurface(parent) {}
+OutputVideoSurface::OutputVideoSurface(QObject *parent) : QObject(parent) {}
 
-QList<QVideoFrame::PixelFormat> OutputVideoSurface::supportedPixelFormats(
-    QAbstractVideoBuffer::HandleType handleType) const {
-
-  if (handleType == QAbstractVideoBuffer::NoHandle) {
-    return QList<QVideoFrame::PixelFormat>() << QVideoFrame::Format_RGB32;
-  } else {
-    return QList<QVideoFrame::PixelFormat>();
-  }
-}
-
-bool OutputVideoSurface::present(const QVideoFrame &frame) {
-  if (!m_label) {
-    qDebug() << "The label is not set!";
-    return false;
-  }
-
+bool OutputVideoSurface::receiveNextFrame(const QVideoFrame &frame) {
   QVideoFrame toDraw(frame);
 
   if (!toDraw.map(QAbstractVideoBuffer::ReadOnly)) {
@@ -35,21 +20,8 @@ bool OutputVideoSurface::present(const QVideoFrame &frame) {
       QImage::Format_RGB32
   );
 
-  m_label->resize(image.size());
-  m_label->setPixmap(QPixmap::fromImage(image));
-  m_label->update();
-
   toDraw.unmap();
 
-  return true;
-}
-
-bool OutputVideoSurface::setOutputLabel(QLabel *label) {
-  if (!label) {
-    qDebug() << "Try to set nullptr instead of label";
-    return false;
-  }
-
-  m_label = label;
+  emit signalOutputImage(image);
   return true;
 }

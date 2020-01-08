@@ -1,23 +1,32 @@
 #ifndef VIDEO_STREAM_SRC_GAUSSIAN_BLUR_H_
 #define VIDEO_STREAM_SRC_GAUSSIAN_BLUR_H_
 
-#include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
 
-class GaussianBlur : public QAbstractVideoSurface {
+class GaussianBlur : public QObject {
  Q_OBJECT
  public:
-  explicit GaussianBlur(QObject *parent);
+  explicit GaussianBlur(QObject *parent = nullptr);
 
-  bool present(const QVideoFrame &frame) override;
-  void setVideoSurface(QAbstractVideoSurface *surface);
+ signals:
+  void signalNextFrame(const QVideoFrame &);
 
-  QList<QVideoFrame::PixelFormat> supportedPixelFormats(
-      QAbstractVideoBuffer::HandleType type) const override;
+ public slots:
+  bool receiveNextFrame(const QVideoFrame &);
+  bool toggle();
+
  private:
-
-  QAbstractVideoSurface *m_surface{nullptr};
   QVideoSurfaceFormat m_format;
+
+  static double gaussian(double m, double sigma, double x);
+  static double gaussian(double m, double sigma, double x, double y);
+
+  const double M = 4;
+  const double SIGMA = 2;
+  const int KERNEL_SIZE = 9;
+  QVector<double> kernel;
+
+  bool active{false};
 };
 
 #endif //VIDEO_STREAM_SRC_GAUSSIAN_BLUR_H_

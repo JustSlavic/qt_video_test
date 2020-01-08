@@ -12,15 +12,15 @@
 #include <QtWidgets/QLabel>
 
 MainWindow::MainWindow()
-    : videoWidget(new QLabel(this)) {
+    : m_videoWidget(new QLabel(this)) {
 
   addMenu();
 
-  videoWidget->setMinimumSize(300, 300);
-  videoWidget->setMaximumSize(1600, 900);
+  m_videoWidget->setMinimumSize(300, 300);
+  m_videoWidget->setMaximumSize(1600, 900);
 
   // MainWindow takes ownership over QVideoWidget
-  setCentralWidget(videoWidget);
+  setCentralWidget(m_videoWidget);
 }
 
 void MainWindow::addMenu() {
@@ -44,9 +44,15 @@ void MainWindow::addMenu() {
   connect(exitAction, &QAction::triggered, []{ QApplication::quit(); });
 
   auto menuFilter = new QMenu("&Filter", menu);
-  menuFilter->addAction("&No filter");
-  menuFilter->addAction("&Gaussian blur");
-  menuFilter->addAction("&Sobel operator");
+  auto gaussianAction = menuFilter->addAction("&Gaussian blur");
+  gaussianAction->setCheckable(true);
+  gaussianAction->setChecked(false);
+  auto sobelAction = menuFilter->addAction("&Sobel operator");
+  sobelAction->setCheckable(true);
+  sobelAction->setChecked(false);
+
+  connect(gaussianAction, &QAction::triggered, this, &MainWindow::signalToggleGaussianFilter, Qt::QueuedConnection);
+  connect(sobelAction, &QAction::triggered, this, &MainWindow::signalToggleSobelFilter, Qt::QueuedConnection);
 
   menu->addMenu(menuFile);
   menu->addMenu(menuFilter);
@@ -55,7 +61,9 @@ void MainWindow::addMenu() {
   this->setMenuBar(menu);
 }
 
-QWidget *MainWindow::getVideoWidget() const {
-  return videoWidget;
+void MainWindow::drawImageOnWidget(QImage image) {
+  m_videoWidget->resize(image.size());
+  m_videoWidget->setPixmap(QPixmap::fromImage(image));
+  m_videoWidget->update();
 }
 

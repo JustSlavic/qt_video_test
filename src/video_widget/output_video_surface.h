@@ -3,22 +3,18 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QLabel>
-#include <QtMultimedia/QAbstractVideoSurface>
+#include <QtMultimedia/QVideoFrame>
 
-class OutputVideoSurface : public QAbstractVideoSurface {
+class OutputVideoSurface : public QObject {
  Q_OBJECT
  public:
-  explicit OutputVideoSurface(QObject *parent);
+  explicit OutputVideoSurface(QObject *parent = nullptr);
 
-  QList<QVideoFrame::PixelFormat> supportedPixelFormats(
-      QAbstractVideoBuffer::HandleType handleType) const override;
+ signals:
+  void signalOutputImage(QImage);
 
-  bool present(const QVideoFrame &frame) override;
-
-  bool setOutputLabel(QLabel *label);
-
- private:
-  QLabel *m_label{nullptr};
+ public slots:
+  bool receiveNextFrame(const QVideoFrame &frame);
 };
 
 #endif //VIDEO_STREAM_SRC_VIDEO_WIDGET_OUTPUT_VIDEO_SURFACE_H_

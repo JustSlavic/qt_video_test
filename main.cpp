@@ -21,8 +21,33 @@ int main(int argc, char **argv) {
 
   auto mainWindow = new MainWindow();
 
-  QObject::connect(mainWindow, &MainWindow::signalPlayVideoFile, videoPlayer, &VideoPlayer::playVideoFile, Qt::QueuedConnection);
-  QObject::connect(mainWindow, &MainWindow::signalPlayWebCamera, videoPlayer, &VideoPlayer::playWebCamera, Qt::QueuedConnection);
+  QObject::connect(mainWindow,
+                   &MainWindow::signalPlayVideoFile,
+                   videoPlayer,
+                   &VideoPlayer::playVideoFile,
+                   Qt::QueuedConnection);
+  QObject::connect(mainWindow,
+                   &MainWindow::signalPlayWebCamera,
+                   videoPlayer,
+                   &VideoPlayer::playWebCamera,
+                   Qt::QueuedConnection);
+
+  QObject::connect(mainWindow,
+                   &MainWindow::signalToggleGaussianFilter,
+                   videoPlayer,
+                   &VideoPlayer::signalToggleGaussianFilter,
+                   Qt::QueuedConnection);
+  QObject::connect(mainWindow,
+                   &MainWindow::signalToggleSobelFilter,
+                   videoPlayer,
+                   &VideoPlayer::signalToggleSobelFilter,
+                   Qt::QueuedConnection);
+
+  QObject::connect(videoPlayer,
+                   &VideoPlayer::signalOutputImage,
+                   mainWindow,
+                   &MainWindow::drawImageOnWidget,
+                   Qt::QueuedConnection);
 
   mainWindow->show();
 
