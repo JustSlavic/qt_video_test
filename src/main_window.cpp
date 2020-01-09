@@ -15,9 +15,8 @@ MainWindow::MainWindow()
     : m_videoWidget(new QLabel(this)) {
 
   addMenu();
-
-  m_videoWidget->setMinimumSize(1280, 720);
-  m_videoWidget->setMaximumSize(1600, 900);
+  setMinimumHeight(600);
+  setMinimumWidth(800);
 
   // MainWindow takes ownership over QVideoWidget
   setCentralWidget(m_videoWidget);
