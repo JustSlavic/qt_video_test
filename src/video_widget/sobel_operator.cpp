@@ -21,8 +21,44 @@ SobelOperator::SobelOperator(QObject *parent)
                 {1, 2, 1}} {}
 
 bool SobelOperator::receiveNextFrame(const QVideoFrame &frame) {
-  emit signalNextFrame(frame);
-  return false;
+    if (!active) {
+      emit signalNextFrame(frame);
+      return true;
+    }
+
+    QVideoFrame forMapping(frame);
+
+    if (!forMapping.map(QAbstractVideoBuffer::ReadOnly)) {
+      qDebug() << "Cannot map forMapping frame";
+      return false;
+    }
+
+    QVideoFrame newFrame(
+        forMapping.mappedBytes(),
+        forMapping.size(),
+        forMapping.bytesPerLine(),
+        forMapping.pixelFormat());
+
+    if (!newFrame.map(QAbstractPlanarVideoBuffer::WriteOnly)) {
+      qDebug() << "Cannot map newly created frame";
+      return false;
+    }
+
+    uchar *oldBytes = forMapping.bits();
+    uchar *newBytes = newFrame.bits();
+
+    std::memcpy(newBytes, oldBytes, forMapping.mappedBytes());
+
+    int height = forMapping.height();
+    int width = forMapping.width();
+
+    applyOperator(oldBytes, newBytes, height, width);
+
+    forMapping.unmap();
+    newFrame.unmap();
+
+    emit signalNextFrame(newFrame);
+    return true;
 }
 
 bool SobelOperator::receiveImage(QImage oldImage) {
