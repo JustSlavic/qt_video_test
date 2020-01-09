@@ -9,7 +9,6 @@ enum ColorShift {
   B_SHIFT = 0,
   G_SHIFT = 1,
   R_SHIFT = 2,
-  A_SHIFT = 3
 };
 
 SobelOperator::SobelOperator(QObject *parent)
@@ -128,7 +127,7 @@ void SobelOperator::applyOperator(const uchar *oldBytes, uchar *newBytes, int he
 
 bool SobelOperator::toggle() {
   active = !active;
-  qDebug() << "Sobel operator turned " << (active ? "on" : "off");
+  qDebug() << "Sobel operator turned" << (active ? "on" : "off");
   return active;
 }
 

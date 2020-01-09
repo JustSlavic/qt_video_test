@@ -12,7 +12,6 @@ enum ColorShift {
   B_SHIFT = 0,
   G_SHIFT = 1,
   R_SHIFT = 2,
-  A_SHIFT = 3
 };
 
 GaussianBlur::GaussianBlur(double standardDeviation, QObject *parent)
@@ -133,7 +132,7 @@ double GaussianBlur::gaussian(double m, double sigma, double x, double y) {
 
 bool GaussianBlur::toggle() {
   active = !active;
-  qDebug() << "Gaussian blur turned " << (active ? "on" : "off");
+  qDebug() << "Gaussian blur turned" << (active ? "on" : "off");
   return active;
 }
 

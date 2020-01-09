@@ -29,9 +29,6 @@ class SobelOperator : public QObject {
   const QVector<QVector<int>> m_kernelX;
   const QVector<QVector<int>> m_kernelY;
 
-  int *Gx;
-  int *Gy;
-
   bool active{false};
 };
 
