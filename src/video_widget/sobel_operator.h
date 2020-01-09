@@ -10,16 +10,20 @@ class SobelOperator : public QObject {
  public:
   explicit SobelOperator(QObject *parent = nullptr);
 
+  QVideoFrame getLastFrame() const;
+
  signals:
-  void signalNextFrame(const QVideoFrame &);
+  void signalNextFrameReady();
   void signalPassImage(QImage);
 
  public slots:
-  bool receiveNextFrame(const QVideoFrame &);
+  bool receiveNextFrame();
   bool receiveImage(QImage);
   bool toggle();
 
  private:
+  QVideoFrame m_lastSavedFrame;
+
   void applyOperator(const uchar *oldBytes, uchar *newBytes, int height, int width);
 
   const QVector<QVector<int>> m_kernelX;

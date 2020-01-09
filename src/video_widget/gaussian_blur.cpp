@@ -1,4 +1,5 @@
 #include "gaussian_blur.h"
+#include "frame_emitter.h"
 
 #include <iostream>
 #include <cmath>
@@ -28,44 +29,47 @@ GaussianBlur::GaussianBlur(QObject *parent)
   std::cerr << "]" << std::endl;
 }
 
-bool GaussianBlur::receiveNextFrame(const QVideoFrame &frame) {
+bool GaussianBlur::receiveNextFrame() {
+  auto sender = dynamic_cast<FrameEmitter *>(QObject::sender());
+  QVideoFrame frame = sender->getLastFrame();
+
   if (!active) {
-    emit signalNextFrame(frame);
+    m_lastSavedFrame = frame;
+    emit signalNextFrameReady();
     return true;
   }
 
-  QVideoFrame forMapping(frame);
-
-  if (!forMapping.map(QAbstractVideoBuffer::ReadOnly)) {
+  if (!frame.map(QAbstractVideoBuffer::ReadOnly)) {
     qDebug() << "Cannot map forMapping frame";
     return false;
   }
 
   QVideoFrame newFrame(
-      forMapping.mappedBytes(),
-      forMapping.size(),
-      forMapping.bytesPerLine(),
-      forMapping.pixelFormat());
+      frame.mappedBytes(),
+      frame.size(),
+      frame.bytesPerLine(),
+      frame.pixelFormat());
 
   if (!newFrame.map(QAbstractPlanarVideoBuffer::WriteOnly)) {
     qDebug() << "Cannot map newly created frame";
     return false;
   }
 
-  uchar *oldBytes = forMapping.bits();
+  uchar *oldBytes = frame.bits();
   uchar *newBytes = newFrame.bits();
 
-  std::memcpy(newBytes, oldBytes, forMapping.mappedBytes());
+  std::memcpy(newBytes, oldBytes, frame.mappedBytes());
 
-  int height = forMapping.height();
-  int width = forMapping.width();
+  int height = frame.height();
+  int width = frame.width();
 
   blur(oldBytes, newBytes, height, width);
 
-  forMapping.unmap();
+  frame.unmap();
   newFrame.unmap();
 
-  emit signalNextFrame(newFrame);
+  m_lastSavedFrame = newFrame;
+  emit signalNextFrameReady();
   return true;
 }
 
@@ -159,4 +163,8 @@ bool GaussianBlur::receiveImage(QImage oldImage) {
 
   emit signalPassImage(newImage);
   return true;
+}
+
+QVideoFrame GaussianBlur::getLastFrame() const {
+  return m_lastSavedFrame;
 }

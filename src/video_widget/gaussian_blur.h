@@ -10,17 +10,19 @@ class GaussianBlur : public QObject {
  public:
   explicit GaussianBlur(QObject *parent = nullptr);
 
+ QVideoFrame getLastFrame() const;
+
  signals:
-  void signalNextFrame(const QVideoFrame &);
+  void signalNextFrameReady();
   void signalPassImage(QImage);
 
  public slots:
-  bool receiveNextFrame(const QVideoFrame &);
+  bool receiveNextFrame();
   bool receiveImage(QImage);
   bool toggle();
 
  private:
-  QVideoSurfaceFormat m_format;
+  QVideoFrame m_lastSavedFrame;
 
   static double gaussian(double m, double sigma, double x);
   static double gaussian(double m, double sigma, double x, double y);

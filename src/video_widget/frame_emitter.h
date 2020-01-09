@@ -13,9 +13,14 @@ class FrameEmitter : public QAbstractVideoSurface {
 
   bool present(const QVideoFrame &frame) override;
 
+  QVideoFrame getLastFrame() const;
+
  signals:
   void signalPassImage(QImage);
-  void signalNextFrame(const QVideoFrame &);
+  void signalNextFrameReady();
+
+ private:
+  QVideoFrame m_lastSavedFrame;
 };
 
 #endif //VIDEO_STREAM_SRC_VIDEO_WIDGET_FRAME_EMITTER_H_

@@ -15,7 +15,7 @@ class OutputVideoSurface : public QObject {
 
  public slots:
   bool receiveImage(QImage);
-  bool receiveNextFrame(const QVideoFrame &frame);
+  bool receiveNextFrame();
 };
 
 #endif //VIDEO_STREAM_SRC_VIDEO_WIDGET_OUTPUT_VIDEO_SURFACE_H_

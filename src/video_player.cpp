@@ -45,17 +45,17 @@ VideoPlayer::VideoPlayer()
           &OutputVideoSurface::signalOutputImage);
 
   connect(m_frameEmitter,
-          &FrameEmitter::signalNextFrame,
+          &FrameEmitter::signalNextFrameReady,
           m_gaussianBlur,
           &GaussianBlur::receiveNextFrame,
           Qt::QueuedConnection);
   connect(m_gaussianBlur,
-          &GaussianBlur::signalNextFrame,
+          &GaussianBlur::signalNextFrameReady,
           m_sobelOperator,
           &SobelOperator::receiveNextFrame,
           Qt::QueuedConnection);
   connect(m_sobelOperator,
-          &SobelOperator::signalNextFrame,
+          &SobelOperator::signalNextFrameReady,
           m_outputSurface,
           &OutputVideoSurface::receiveNextFrame,
           Qt::QueuedConnection);
