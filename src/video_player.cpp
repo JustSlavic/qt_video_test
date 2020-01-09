@@ -8,7 +8,7 @@
 VideoPlayer::VideoPlayer()
     : m_mediaPlayer(new QMediaPlayer(this)),
       m_frameEmitter(new FrameEmitter(this)),
-      m_gaussianBlur(new GaussianBlur()),
+      m_gaussianBlur(new GaussianBlur(3)),
       m_gaussianBlurThread(new QThread(this)),
       m_sobelOperator(new SobelOperator()),
       m_sobelOperatorThread(new QThread(this)),

@@ -15,8 +15,12 @@ enum ColorShift {
   A_SHIFT = 3
 };
 
-GaussianBlur::GaussianBlur(QObject *parent)
-    : QObject(parent), kernel(KERNEL_SIZE, 0) {
+GaussianBlur::GaussianBlur(double sigma, QObject *parent)
+    : QObject(parent),
+      SIGMA(sigma),
+      KERNEL_SIZE(6*static_cast<int>(std::floor(sigma)) + 1),
+      M(KERNEL_SIZE / 2),
+      kernel(KERNEL_SIZE, 0) {
 
   for (int i = 0; i < KERNEL_SIZE; ++i) {
     kernel[i] = gaussian(M, SIGMA, static_cast<double>(i));

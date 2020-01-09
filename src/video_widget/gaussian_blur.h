@@ -8,7 +8,7 @@
 class GaussianBlur : public QObject {
  Q_OBJECT
  public:
-  explicit GaussianBlur(QObject *parent = nullptr);
+  explicit GaussianBlur(double sigma, QObject *parent = nullptr);
 
  QVideoFrame getLastFrame() const;
 
@@ -29,9 +29,9 @@ class GaussianBlur : public QObject {
 
   void blur(const uchar *oldBytes, uchar *newBytes, int height, int width);
 
-  const double M = 4;
-  const double SIGMA = 2;
-  const int KERNEL_SIZE = 9;
+  const double SIGMA;
+  const int KERNEL_SIZE;
+  const int M;
   QVector<double> kernel;
 
   bool active{false};
