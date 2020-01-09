@@ -15,20 +15,20 @@ enum ColorShift {
   A_SHIFT = 3
 };
 
-GaussianBlur::GaussianBlur(double sigma, QObject *parent)
+GaussianBlur::GaussianBlur(double standardDeviation, QObject *parent)
     : QObject(parent),
-      SIGMA(sigma),
-      KERNEL_SIZE(6*static_cast<int>(std::floor(sigma)) + 1),
-      M(KERNEL_SIZE / 2),
-      kernel(KERNEL_SIZE, 0) {
+      m_standardDeviation(standardDeviation),
+      m_kernelSize(6*static_cast<int>(std::floor(standardDeviation)) + 1),
+      m_expectedValue(m_kernelSize / 2),
+      m_kernel(m_kernelSize, 0) {
 
-  for (int i = 0; i < KERNEL_SIZE; ++i) {
-    kernel[i] = gaussian(M, SIGMA, static_cast<double>(i));
+  for (int i = 0; i < m_kernelSize; ++i) {
+    m_kernel[i] = gaussian(m_expectedValue, m_standardDeviation, static_cast<double>(i));
   }
 
   std::cerr << "kernel: [";
-  for (int i = 0; i < KERNEL_SIZE; ++i) {
-    std::cerr << kernel[i] << " ";
+  for (int i = 0; i < m_kernelSize; ++i) {
+    std::cerr << m_kernel[i] << " ";
   }
   std::cerr << "]" << std::endl;
 }
@@ -80,17 +80,17 @@ bool GaussianBlur::receiveNextFrame() {
 void GaussianBlur::blur(const uchar *oldBytes, uchar *newBytes, int height, int width) {
   int bytesPerLine = width * 4;
 
-  int boundary = (KERNEL_SIZE - 1) / 2;
+  int boundary = (m_kernelSize - 1) / 2;
   for (int i = 0; i < height; ++i) {
     for (int j = boundary; j < width - boundary; ++j) {
       double averageR = 0;
       double averageG = 0;
       double averageB = 0;
 
-      for (int s = 0; s < KERNEL_SIZE; ++s) {
-        averageR += kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + R_SHIFT);
-        averageG += kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + G_SHIFT);
-        averageB += kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + B_SHIFT);
+      for (int s = 0; s < m_kernelSize; ++s) {
+        averageR += m_kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + R_SHIFT);
+        averageG += m_kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + G_SHIFT);
+        averageB += m_kernel[s] * *(oldBytes + i * bytesPerLine + (j + s - boundary) * 4 + B_SHIFT);
       }
 
       *(newBytes + i * bytesPerLine + j * 4 + R_SHIFT) = static_cast<uchar>(averageR);
@@ -105,10 +105,10 @@ void GaussianBlur::blur(const uchar *oldBytes, uchar *newBytes, int height, int 
       double averageG = 0;
       double averageB = 0;
 
-      for (int s = 0; s < KERNEL_SIZE; ++s) {
-        averageR += kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + R_SHIFT);
-        averageG += kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + G_SHIFT);
-        averageB += kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + B_SHIFT);
+      for (int s = 0; s < m_kernelSize; ++s) {
+        averageR += m_kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + R_SHIFT);
+        averageG += m_kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + G_SHIFT);
+        averageB += m_kernel[s] * *(newBytes + (i + s - boundary) * bytesPerLine + j * 4 + B_SHIFT);
       }
 
       *(newBytes + i * bytesPerLine + j * 4 + R_SHIFT) = static_cast<uchar>(averageR);
