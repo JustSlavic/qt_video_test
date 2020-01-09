@@ -1,6 +1,8 @@
 #ifndef VIDEO_STREAM_SRC_GAUSSIAN_BLUR_H_
 #define VIDEO_STREAM_SRC_GAUSSIAN_BLUR_H_
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <QVideoSurfaceFormat>
 
 class GaussianBlur : public QObject {
