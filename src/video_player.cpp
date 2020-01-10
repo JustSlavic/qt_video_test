@@ -69,12 +69,12 @@ VideoPlayer::VideoPlayer()
           &VideoPlayer::signalToggleGaussianFilter,
           m_gaussianBlur,
           &GaussianBlur::toggle,
-          Qt::QueuedConnection);
+          Qt::DirectConnection);
   connect(this,
           &VideoPlayer::signalToggleSobelFilter,
           m_sobelOperator,
           &SobelOperator::toggle,
-          Qt::QueuedConnection);
+          Qt::DirectConnection);
 
   m_gaussianBlur->moveToThread(m_gaussianBlurThread);
   m_gaussianBlurThread->start();
