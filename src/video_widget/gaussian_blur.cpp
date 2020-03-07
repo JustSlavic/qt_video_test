@@ -17,7 +17,7 @@ enum ColorShift {
 GaussianBlur::GaussianBlur(double standardDeviation, QObject *parent)
     : QObject(parent),
       m_standardDeviation(standardDeviation),
-      m_kernelSize(6*static_cast<int>(std::floor(standardDeviation)) + 1),
+      m_kernelSize(2*static_cast<int>(std::ceil(3*standardDeviation)) + 1),
       m_expectedValue(m_kernelSize / 2),
       m_kernel(m_kernelSize, 0) {
 
@@ -25,6 +25,8 @@ GaussianBlur::GaussianBlur(double standardDeviation, QObject *parent)
     m_kernel[i] = gaussian(m_expectedValue, m_standardDeviation, static_cast<double>(i));
   }
 
+  std::cerr << "standard deviation = " << m_standardDeviation << std::endl;
+  std::cerr << "expected value = " << m_expectedValue << std::endl;
   std::cerr << "kernel: [";
   for (int i = 0; i < m_kernelSize; ++i) {
     std::cerr << m_kernel[i] << " ";
@@ -118,7 +120,7 @@ void GaussianBlur::blur(const uchar *oldBytes, uchar *newBytes, int height, int 
 }
 
 double GaussianBlur::gaussian(double m, double sigma, double x) {
-  double exponential = -((x - m) * (x - m) / (2 * sigma * sigma));
+  double exponential = -((x - m) * (x - m) / (M_SQRT2 * sigma * sigma));
   double normalize_coefficient = std::sqrt(2 * M_PI) * sigma;
   return std::exp(exponential) / normalize_coefficient;
 }
