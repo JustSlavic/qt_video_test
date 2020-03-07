@@ -24,56 +24,36 @@ VideoPlayer::VideoPlayer()
     m_camera->setCaptureMode(QCamera::CaptureVideo);
   }
 
-  connect(this,
-          &VideoPlayer::signalPassImage,
-          m_frameEmitter,
-          &FrameEmitter::signalPassImage,
+  connect(this, &VideoPlayer::signalPassImage,
+          m_frameEmitter, &FrameEmitter::signalPassImage,
           Qt::QueuedConnection);
-  connect(m_frameEmitter,
-          &FrameEmitter::signalPassImage,
-          m_gaussianBlur,
-          &GaussianBlur::receiveImage,
+  connect(m_frameEmitter, &FrameEmitter::signalPassImage,
+          m_gaussianBlur, &GaussianBlur::receiveImage,
           Qt::QueuedConnection);
-  connect(m_gaussianBlur,
-          &GaussianBlur::signalPassImage,
-          m_sobelOperator,
-          &SobelOperator::receiveImage,
+  connect(m_gaussianBlur, &GaussianBlur::signalPassImage,
+          m_sobelOperator, &SobelOperator::receiveImage,
           Qt::QueuedConnection);
-  connect(m_sobelOperator,
-          &SobelOperator::signalPassImage,
-          m_outputSurface,
-          &OutputVideoSurface::signalOutputImage);
+  connect(m_sobelOperator, &SobelOperator::signalPassImage,
+          m_outputSurface, &OutputVideoSurface::signalOutputImage);
 
-  connect(m_frameEmitter,
-          &FrameEmitter::signalNextFrameReady,
-          m_gaussianBlur,
-          &GaussianBlur::receiveNextFrame,
+  connect(m_frameEmitter, &FrameEmitter::signalNextFrameReady,
+          m_gaussianBlur, &GaussianBlur::receiveNextFrame,
           Qt::QueuedConnection);
-  connect(m_gaussianBlur,
-          &GaussianBlur::signalNextFrameReady,
-          m_sobelOperator,
-          &SobelOperator::receiveNextFrame,
+  connect(m_gaussianBlur, &GaussianBlur::signalNextFrameReady,
+          m_sobelOperator, &SobelOperator::receiveNextFrame,
           Qt::QueuedConnection);
-  connect(m_sobelOperator,
-          &SobelOperator::signalNextFrameReady,
-          m_outputSurface,
-          &OutputVideoSurface::receiveNextFrame,
+  connect(m_sobelOperator, &SobelOperator::signalNextFrameReady,
+          m_outputSurface, &OutputVideoSurface::receiveNextFrame,
           Qt::QueuedConnection);
-  connect(m_outputSurface,
-          &OutputVideoSurface::signalOutputImage,
-          this,
-          &VideoPlayer::signalOutputImage,
+  connect(m_outputSurface, &OutputVideoSurface::signalOutputImage,
+          this, &VideoPlayer::signalOutputImage,
           Qt::QueuedConnection);
 
-  connect(this,
-          &VideoPlayer::signalToggleGaussianFilter,
-          m_gaussianBlur,
-          &GaussianBlur::toggle,
+  connect(this, &VideoPlayer::signalToggleGaussianFilter,
+          m_gaussianBlur, &GaussianBlur::toggle,
           Qt::DirectConnection);
-  connect(this,
-          &VideoPlayer::signalToggleSobelFilter,
-          m_sobelOperator,
-          &SobelOperator::toggle,
+  connect(this, &VideoPlayer::signalToggleSobelFilter,
+          m_sobelOperator, &SobelOperator::toggle,
           Qt::DirectConnection);
 
   m_gaussianBlur->moveToThread(m_gaussianBlurThread);

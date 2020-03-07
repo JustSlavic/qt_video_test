@@ -7,6 +7,7 @@
 #include "src/main_window.h"
 #include "src/video_player.h"
 
+
 int main(int argc, char **argv) {
   QApplication app(argc, argv);
 
@@ -14,7 +15,6 @@ int main(int argc, char **argv) {
   QDir::setCurrent(currentPath);
 
   auto videoPlayer = new VideoPlayer();
-
   auto mainWindow = new MainWindow();
 
   QObject::connect(mainWindow,

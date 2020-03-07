@@ -18,6 +18,8 @@ MainWindow::MainWindow()
   setMinimumHeight(600);
   setMinimumWidth(800);
 
+  m_videoWidget->setMaximumSize(1600, 900);
+
   // MainWindow takes ownership over QVideoWidget
   setCentralWidget(m_videoWidget);
 }
@@ -31,27 +33,27 @@ void MainWindow::addMenu() {
   auto cameraAction = menuFile->addAction("&Camera");
   auto exitAction = menuFile->addAction("&Exit");
 
-  connect(loadImageAction, &QAction::triggered, [this] {
-    QString filepath = QFileDialog::getOpenFileName(this,
+  connect(loadImageAction, &QAction::triggered, [self=this] {
+    QString filepath = QFileDialog::getOpenFileName(self,
                                                     tr("Select image"),
                                                     QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
                                                     tr("Image files (*.jpg *.png);;All files (*)"));
 
     if (filepath.isNull()) return;
-    m_state = State::ImageFile;
+    self->m_state = State::ImageFile;
     qDebug() << "State::ImageFile";
-    emit signalLoadImageFile(filepath);
+    emit self->signalLoadImageFile(filepath);
   });
 
-  connect(loadVideoAction, &QAction::triggered, [this] {
-    QString filepath = QFileDialog::getOpenFileName(this,
+  connect(loadVideoAction, &QAction::triggered, [self=this] {
+    QString filepath = QFileDialog::getOpenFileName(self,
                                                     tr("Select video"),
                                                     QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
                                                     tr("Video files (*.mp4 *.avi *.mkv);;All files (*)"));
     if (filepath.isNull()) return;
-    m_state = State::VideoFile;
+    self->m_state = State::VideoFile;
     qDebug() << "State::VideoFile";
-    emit signalPlayVideoFile(filepath);
+    emit self->signalPlayVideoFile(filepath);
   });
 
   connect(cameraAction, &QAction::triggered, [this] {
